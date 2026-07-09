@@ -60,6 +60,7 @@ repeat with w in windows
 repeat with t in tabs of w
 repeat with s in sessions of t
 if (name of s as text) starts with "${escapedSessionName}" then
+select w
 select t
 return
 end if
@@ -103,7 +104,7 @@ function terminalActivateBundleId(
   if (env.TERM_PROGRAM === "Apple_Terminal") {
     return "com.apple.Terminal";
   }
-  return undefined;
+  return "com.googlecode.iterm2";
 }
 
 function desktopNotificationCommands(

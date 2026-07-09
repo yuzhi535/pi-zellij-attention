@@ -106,8 +106,40 @@ test("sendDesktopNotification prefers terminal-notifier", async () => {
   assert.match(executeCommand, /^\/bin\/sh -c /);
   assert.match(executeCommand, /zellij --session demo-session action focus-pane-id terminal_16/);
   assert.match(executeCommand, /osascript/);
+  assert.match(executeCommand, /select w/);
   assert.match(executeCommand, /select t/);
   assert.deepEqual(result, { ok: true, notifier: "terminal-notifier", clickAction: true });
+});
+
+test("sendDesktopNotification defaults to iTerm activation for Zellij clicks", async () => {
+  const calls: Array<{ command: string; args: string[] }> = [];
+  const execCommand: ExecCommand = async (command, args) => {
+    calls.push({ command, args });
+    return { code: 0, stdout: "", stderr: "" };
+  };
+
+  await sendDesktopNotification(execCommand, {
+    PATH: "/opt/homebrew/bin:/usr/bin:/bin",
+    TERM_PROGRAM: "vscode",
+    ZELLIJ_SESSION_NAME: "demo-session",
+    ZELLIJ_PANE_ID: "16",
+  });
+
+  assert.equal(calls[0]?.command, "terminal-notifier");
+  assert.deepEqual(calls[0]?.args.slice(0, 8), [
+    "-title",
+    "Pi",
+    "-message",
+    "Pi finished in Zellij pane 16",
+    "-group",
+    "zellij-attention-pi-16",
+    "-activate",
+    "com.googlecode.iterm2",
+  ]);
+  const executeCommand = calls[0]?.args.at(-1) || "";
+  assert.match(executeCommand, /osascript/);
+  assert.match(executeCommand, /select w/);
+  assert.match(executeCommand, /select t/);
 });
 
 test("sendDesktopNotification falls back to alerter then osascript", async () => {
