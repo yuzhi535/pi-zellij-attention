@@ -55,6 +55,51 @@ There are two parts:
 
 ## Installation
 
+### Agent install prompt
+
+Paste this prompt into Pi or another coding agent to install and verify the project for you:
+
+````text
+Install pi-zellij-attention on this macOS machine.
+
+Repository: https://github.com/yuzhi535/pi-zellij-attention
+
+Goal:
+- Build and install the Zellij WASM plugin.
+- Install the Pi extension.
+- Ensure clickable macOS notifications work with iTerm2/Zellij.
+- Verify with the provided tests and a manual `/zellij-attention-test` run.
+
+Steps:
+1. Clone or update the repository locally.
+2. Run `npx --yes tsx --test pi-extension/index.test.ts`.
+3. Run `cargo test --target "$(rustc -vV | awk '/host:/ {print $2}')" --lib`.
+4. Run `cargo build --target wasm32-wasip1 --release`.
+5. Copy `target/wasm32-wasip1/release/zellij-attention.wasm` to `~/.config/zellij/plugins/zellij-attention.wasm`.
+6. Ensure `~/.config/zellij/config.kdl` has this `load_plugins` entry:
+
+   ```kdl
+   load_plugins {
+       "file:~/.config/zellij/plugins/zellij-attention.wasm" {
+           enabled "true"
+           waiting_icon "⏳"
+           completed_icon "✅"
+       }
+   }
+   ```
+
+7. Copy `pi-extension/index.ts` to `~/.pi/agent/extensions/zellij-attention/index.ts`.
+8. Ensure `terminal-notifier` is installed; use `brew install terminal-notifier` if needed.
+9. Ask me to restart Zellij if the `load_plugins` entry changed.
+10. Ask me to run `/reload` in Pi, then `/zellij-attention-test`.
+11. Confirm that clicking the macOS notification returns to the originating iTerm/Zellij pane.
+
+Important constraints:
+- Use `zellij pipe --name`, never `zellij pipe --plugin`.
+- Do not expose or edit unrelated Pi configuration.
+- Keep automatic Pi notification failures quiet; use `/zellij-attention-test` for visible setup errors.
+````
+
 ### 1. Build and install the Zellij WASM plugin
 
 Build from this repository:
