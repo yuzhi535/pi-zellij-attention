@@ -1,0 +1,15 @@
+# Rust
+target/
+
+# Local worktrees / agent state
+.worktrees/
+.superpowers/
+
+# OS/editor
+.DS_Store
+*.swp
+*.tmp
+
+# Local built plugin copies
+*.wasm
+!assets/*.wasm
